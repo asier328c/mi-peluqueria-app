@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✂️ Gestión de Citas - Peluquería</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f6fa;
+            color: #2c3e50;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        h1 {
+            text-align: center;
+            color: #e74c3c;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitulo {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 2rem;
+        }
+
+        /* Formulario */
+        .formulario {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            margin-bottom: 2rem;
+        }
+
+        .formulario h2 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .campo {
+            margin-bottom: 1rem;
+        }
+
+        .campo label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .campo input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .campo input:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+
+        .btn-principal {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-principal:hover {
+            background: #c0392b;
+        }
+
+        /* Lista de citas */
+        .lista-citas {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .lista-citas h2 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .filtro-fecha {
+            margin-bottom: 1rem;
+        }
+
+        .filtro-fecha input {
+            padding: 0.5rem;
+            border: 2px solid #ecf0f1;
+            border-radius: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 2px solid #ecf0f1;
+            color: #7f8c8d;
+            font-size: 0.85rem;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .estado-pendiente {
+            color: #f39c12;
+            font-weight: bold;
+        }
+
+        .estado-confirmado {
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .estado-cancelado {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+
+        .btn-eliminar {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.35rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .mensaje-exito {
+            background: #d4edda;
+            color: #155724;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .mensaje-error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .sin-citas {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>✂️ Gestión de Citas</h1>
+    <p class="subtitulo">Peluquería - Recordatorios automáticos por WhatsApp</p>
+
+    <div class="mensaje-exito" id="mensaje-exito">¡Cita guardada correctamente!</div>
+    <div class="mensaje-error" id="mensaje-error">Error al guardar la cita.</div>
+
+    <!-- Formulario para nueva cita -->
+    <div class="formulario">
+        <h2>📅 Nueva Cita</h2>
+        <form id="form-cita" onsubmit="guardarCita(event)">
+            <div class="campo">
+                <label for="nombre">Nombre del cliente *</label>
+                <input type="text" id="nombre" required placeholder="Ej: María García">
+            </div>
+
+            <div class="campo">
+                <label for="telefono">Teléfono (con prefijo) *</label>
+                <input type="tel" id="telefono" required placeholder="Ej: 34612345678">
+            </div>
+
+            <div class="campo">
+                <label for="fecha">Fecha *</label>
+                <input type="date" id="fecha" required>
+            </div>
+
+            <div class="campo">
+                <label for="hora">Hora *</label>
+                <input type="time" id="hora" required>
+            </div>
+
+            <div class="campo">
+                <label for="servicio">Servicio</label>
+                <input type="text" id="servicio" placeholder="Ej: Corte, tinte, mechas...">
+            </div>
+
+            <button type="submit" class="btn-principal">💾 Guardar Cita</button>
+        </form>
+    </div>
+
+    <!-- Lista de citas -->
+    <div class="lista-citas">
+        <h2>📋 Citas Programadas</h2>
+        
+        <div class="filtro-fecha">
+            <label for="filtro-fecha">Ver citas del día:</label>
+            <input type="date" id="filtro-fecha" onchange="cargarCitas()">
+        </div>
+
+        <table id="tabla-citas">
+            <thead>
+                <tr>
+                    <th>Hora</th>
+                    <th>Cliente</th>
+                    <th>Teléfono</th>
+                    <th>Servicio</th>
+                    <th>Estado</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-citas">
+                <tr>
+                    <td colspan="6" class="sin-citas">Cargando citas...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:3000';
+
+        // Poner fecha de hoy en el filtro
+        document.getElementById('filtro-fecha').value = new Date().toISOString().split('T')[0];
+
+        // Cargar citas al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarCitas();
+        });
+
+        async function guardarCita(event) {
+            event.preventDefault();
+
+            const cita = {
+                nombre: document.getElementById('nombre').value,
+                telefono: document.getElementById('telefono').value,
+                fecha: document.getElementById('fecha').value,
+                hora: document.getElementById('hora').value,
+                servicio: document.getElementById('servicio').value
+            };
+
+            try {
+                const response = await fetch(`${API_URL}/citas`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cita)
+                });
+
+                const resultado = await response.json();
+
+                if (resultado.exito) {
+                    mostrarMensaje('exito');
+                    document.getElementById('form-cita').reset();
+                    cargarCitas();
+                } else {
+                    mostrarMensaje('error');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarMensaje('error');
+            }
+        }
+
+        async function cargarCitas() {
+            const fecha = document.getElementById('filtro-fecha').value;
+            
+            try {
+                const response = await fetch(`${API_URL}/citas/${fecha}`);
+                const resultado = await response.json();
+
+                const tbody = document.getElementById('tbody-citas');
+                
+                if (resultado.datos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="sin-citas">No hay citas para este día</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = resultado.datos.map(cita => `
+                    <tr>
+                        <td>${cita.hora}</td>
+                        <td>${cita.nombre}</td>
+                        <td>${cita.telefono}</td>
+                        <td>${cita.servicio || '-'}</td>
+                        <td class="estado-${cita.estado}">${cita.estado}</td>
+                        <td>
+                            <button class="btn-eliminar" onclick="eliminarCita(${cita.id})">🗑️</button>
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('tbody-citas').innerHTML = 
+                    '<tr><td colspan="6" class="sin-citas">Error al cargar citas</td></tr>';
+            }
+        }
+
+        async function eliminarCita(id) {
+            if (!confirm('¿Eliminar esta cita?')) return;
+
+            try {
+                const response = await fetch(`${API_URL}/citas/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const resultado = await response.json();
+                
+                if (resultado.exito) {
+                    cargarCitas();
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function mostrarMensaje(tipo) {
+            const div = document.getElementById(`mensaje-${tipo}`);
+            div.style.display = 'block';
+            setTimeout(() => {
+                div.style.display = 'none';
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
