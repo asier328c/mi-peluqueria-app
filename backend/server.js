@@ -63,19 +63,6 @@ async function enviarWhatsApp(telefono, mensaje) {
         return false;
     }
 }
-            headers: {
-                'X-API-Token': WAPPFLY_API_KEY,
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        console.log(`WhatsApp enviado a ${telefono}:`, response.data);
-        return true;
-    } catch (error) {
-        console.error(`Error enviando a ${telefono}:`, error.response?.data || error.message);
-        return false;
-    }
-}
 
 // ============================================
 // RUTAS API
