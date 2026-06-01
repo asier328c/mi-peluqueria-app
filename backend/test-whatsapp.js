@@ -1,29 +1,28 @@
 // ============================================
-// SCRIPT DE PRUEBA PARA ENVIAR WHATSAPP (Wappfly)
+// SCRIPT DE PRUEBA PARA ENVIAR WHATSAPP (WasenderAPI)
 // ============================================
 
 const axios = require('axios');
 
-// CONFIGURACION WAPPFLY
-const WAPPFLY_API_KEY = '58af262719284617adc07231e83718f95bacfc9ec7a59ea40994efcc0cb54077';
-const WAPPFLY_PHONE = '34636894249'; // Tu número de Wappfly (sin +)
+// CONFIGURACION WASENDERAPI
+const WASENDER_API_KEY = 'ffc100942001784806c639447aadbe43dd4c4d9c12ac4da37392d35b80ab5989';
 
 // Numero de destino (tu movil para probar)
 const TELEFONO_DESTINO = '34644822278'; // <-- REEMPLAZA CON TU NUMERO
 
 // Mensaje de prueba
-const MENSAJE = 'Hola! Este es un mensaje de prueba de tu sistema de citas. Si lo recibes, todo funciona correctamente. 🎉';
+const MENSAJE = 'Hola! Este es un mensaje de prueba de tu sistema de citas con WasenderAPI. Si lo recibes, todo funciona correctamente. 🎉';
 
 async function enviarWhatsApp(telefono, mensaje) {
     try {
-        const url = 'https://wappfly.com/api/messages/send';
+        const url = 'https://wasenderapi.com/api/send-message';
         
         const response = await axios.post(url, {
-    to: telefono + '@s.whatsapp.net',
-    text: mensaje
-}, {
+            to: '+' + telefono,
+            text: mensaje
+        }, {
             headers: {
-                'X-API-Token': WAPPFLY_API_KEY,
+                'Authorization': 'Bearer ' + WASENDER_API_KEY,
                 'Content-Type': 'application/json'
             }
         });

@@ -5,20 +5,22 @@ const axios = require('axios');
 const dbPath = path.join(__dirname, 'citas.db');
 const db = new Database(dbPath);
 
-const WAPPFLY_API_KEY = '58af262719284617adc07231e83718f95bacfc9ec7a59ea40994efcc0cb54077';
+const WASENDER_API_KEY = 'ffc100942001784806c639447aadbe43dd4c4d9c12ac4da37392d35b80ab5989';
 
 async function enviarWhatsApp(telefono, mensaje) {
     try {
-        const url = 'https://wappfly.com/api/messages/send';
+        const url = 'https://wasenderapi.com/api/send-message';
+        
         const response = await axios.post(url, {
-    to: telefono + '@s.whatsapp.net',
-    text: mensaje
-}, {
+            to: '+' + telefono,
+            text: mensaje
+        }, {
             headers: {
-                'X-API-Token': WAPPFLY_API_KEY,
+                'Authorization': 'Bearer ' + WASENDER_API_KEY,
                 'Content-Type': 'application/json'
             }
         });
+        
         console.log(`✅ Enviado a ${telefono}:`, response.data);
         return true;
     } catch (error) {
@@ -35,7 +37,7 @@ function enviarRecordatorios() {
     const stmt = db.prepare('SELECT * FROM citas WHERE fecha = ? AND recordatorio_enviado = 0');
     const citas = stmt.all(fechaManana);
 
-    console.log(`📅 Fecha mañana: ${fechaManana}`);
+    console.log(`📅 Fecha manana: ${fechaManana}`);
     console.log(`📋 Citas encontradas: ${citas.length}`);
 
     if (citas.length === 0) {
@@ -44,7 +46,7 @@ function enviarRecordatorios() {
     }
 
     citas.forEach(async (cita) => {
-        const mensaje = `Hola ${cita.nombre}, le recordamos su cita mañana ${cita.fecha} a las ${cita.hora} en nuestra peluquería. Por favor confirme con un SI si va a venir. Gracias.`;
+        const mensaje = `Hola ${cita.nombre}, le recordamos su cita manana ${cita.fecha} a las ${cita.hora} en nuestra peluqueria. Por favor confirme con un SI si va a venir. Gracias.`;
         
         const enviado = await enviarWhatsApp(cita.telefono, mensaje);
         if (enviado) {

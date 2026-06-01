@@ -36,22 +36,21 @@ db.exec(`CREATE TABLE IF NOT EXISTS citas (
 )`);
 
 // ============================================
-// CONFIGURACION WHATSAPP (Wappfly)
+// CONFIGURACION WHATSAPP (WasenderAPI)
 // ============================================
-const WAPPFLY_API_KEY = '58af262719284617adc07231e83718f95bacfc9ec7a59ea40994efcc0cb54077';
-const WAPPFLY_PHONE = '34636894249';
+const WASENDER_API_KEY = 'ffc100942001784806c639447aadbe43dd4c4d9c12ac4da37392d35b80ab5989';
 
 // Funcion para enviar WhatsApp
 async function enviarWhatsApp(telefono, mensaje) {
     try {
-        const url = 'https://wappfly.com/api/messages/send';
+        const url = 'https://wasenderapi.com/api/send-message';
         
         const response = await axios.post(url, {
-            to: telefono + '@s.whatsapp.net',
+            to: '+' + telefono,
             text: mensaje
         }, {
             headers: {
-                'X-API-Token': WAPPFLY_API_KEY,
+                'Authorization': 'Bearer ' + WASENDER_API_KEY,
                 'Content-Type': 'application/json'
             }
         });
@@ -62,6 +61,26 @@ async function enviarWhatsApp(telefono, mensaje) {
         console.error(`Error enviando a ${telefono}:`, error.response?.data || error.message);
         return false;
     }
+}
+
+// ============================================
+// FUNCION AUXILIAR: Convertir fecha dd/mm/aaaa a yyyy-mm-dd
+// ============================================
+function convertirFecha(fecha) {
+    // Si ya viene en formato yyyy-mm-dd, la devuelve igual
+    if (fecha.includes('-') && fecha.length === 10) {
+        return fecha;
+    }
+    
+    // Si viene en formato dd/mm/aaaa, la convierte
+    if (fecha.includes('/')) {
+        const partes = fecha.split('/');
+        // partes[0] = dia, partes[1] = mes, partes[2] = año
+        return `${partes[2]}-${partes[1].padStart(2, '0')}-${partes[0].padStart(2, '0')}`;
+    }
+    
+    // Si no reconoce el formato, devuelve la fecha original
+    return fecha;
 }
 
 // ============================================
@@ -76,8 +95,11 @@ app.post('/citas', (req, res) => {
         return res.status(400).json({ exito: false, mensaje: 'Faltan datos obligatorios' });
     }
 
+    // Convertir fecha al formato correcto
+    const fechaFormateada = convertirFecha(fecha);
+
     const stmt = db.prepare('INSERT INTO citas (nombre, telefono, fecha, hora, servicio) VALUES (?, ?, ?, ?, ?)');
-    const result = stmt.run(nombre, telefono, fecha, hora, servicio || '');
+    const result = stmt.run(nombre, telefono, fechaFormateada, hora, servicio || '');
     
     res.json({ 
         exito: true, 
