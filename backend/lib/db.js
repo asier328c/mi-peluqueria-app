@@ -17,7 +17,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS citas (
     creado_en DATETIME DEFAULT CURRENT_TIMESTAMP
 )`);
 
-// Tabla de clientes (NUEVO)
+// Tabla de clientes
 db.exec(`CREATE TABLE IF NOT EXISTS clientes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nombre TEXT NOT NULL UNIQUE,
@@ -26,7 +26,7 @@ db.exec(`CREATE TABLE IF NOT EXISTS clientes (
     creado_en DATETIME DEFAULT CURRENT_TIMESTAMP
 )`);
 
-// Tabla de configuración de mensajes (NUEVO)
+// Tabla de configuración de mensajes
 db.exec(`CREATE TABLE IF NOT EXISTS config_mensajes (
     id INTEGER PRIMARY KEY CHECK (id = 1),
     mensaje_recordatorio TEXT NOT NULL,
