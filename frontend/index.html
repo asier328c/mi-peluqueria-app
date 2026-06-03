@@ -36,7 +36,6 @@
             overflow-x: hidden;
         }
 
-        /* Animación de fondo */
         .bg-animation {
             position: fixed;
             top: 0;
@@ -77,7 +76,6 @@
             66% { transform: translate(-20px, 20px) scale(0.9); }
         }
 
-        /* Header */
         .header {
             background: var(--glass);
             backdrop-filter: blur(10px);
@@ -146,14 +144,12 @@
             50% { opacity: 0.5; }
         }
 
-        /* Layout */
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem;
         }
 
-        /* Navigation */
         .nav-tabs {
             display: flex;
             gap: 0.5rem;
@@ -196,7 +192,6 @@
             font-size: 1rem;
         }
 
-        /* Sections */
         .section {
             display: none;
             animation: fadeIn 0.4s ease;
@@ -211,7 +206,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Cards */
         .card {
             background: var(--bg-card);
             backdrop-filter: blur(10px);
@@ -248,7 +242,6 @@
             font-size: 1.1rem;
         }
 
-        /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -324,23 +317,6 @@
             font-weight: 500;
         }
 
-        .stat-change {
-            font-size: 0.8rem;
-            margin-top: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-        }
-
-        .stat-change.positive {
-            color: #22c55e;
-        }
-
-        .stat-change.negative {
-            color: var(--accent);
-        }
-
-        /* Forms */
         .form-group {
             margin-bottom: 1.25rem;
         }
@@ -381,7 +357,6 @@
             resize: vertical;
         }
 
-        /* Buttons */
         .btn {
             display: inline-flex;
             align-items: center;
@@ -445,7 +420,6 @@
             font-size: 0.85rem;
         }
 
-        /* Tables */
         .table-container {
             overflow-x: auto;
             border-radius: 12px;
@@ -520,7 +494,6 @@
             color: #ef4444;
         }
 
-        /* Charts */
         .chart-bar {
             display: flex;
             align-items: center;
@@ -571,7 +544,6 @@
             background: linear-gradient(90deg, var(--warning), #f59e0b);
         }
 
-        /* Suggestions */
         .suggestions {
             position: absolute;
             top: 100%;
@@ -614,7 +586,6 @@
             color: var(--text-secondary);
         }
 
-        /* Messages */
         .alert {
             padding: 1rem 1.25rem;
             border-radius: 12px;
@@ -647,7 +618,6 @@
             to { opacity: 1; transform: translateX(0); }
         }
 
-        /* Empty state */
         .empty-state {
             text-align: center;
             padding: 3rem;
@@ -660,7 +630,65 @@
             opacity: 0.5;
         }
 
-        /* Responsive */
+        .info-box {
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.15);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .info-box code {
+            background: var(--bg-primary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            color: var(--success);
+            font-size: 0.85rem;
+        }
+
+        .result-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .result-box {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .result-number {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         @media (max-width: 768px) {
             .nav-tabs {
                 flex-wrap: wrap;
@@ -686,68 +714,6 @@
             .logo {
                 font-size: 1.25rem;
             }
-        }
-
-        /* Loading */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border);
-            border-top-color: var(--accent);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Info box */
-        .info-box {
-            background: rgba(0, 217, 255, 0.05);
-            border: 1px solid rgba(0, 217, 255, 0.15);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-        }
-
-        .info-box code {
-            background: var(--bg-primary);
-            padding: 0.2rem 0.5rem;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            color: var(--success);
-            font-size: 0.85rem;
-        }
-
-        /* Result summary */
-        .result-summary {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .result-box {
-            background: var(--bg-primary);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-        }
-
-        .result-number {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--accent);
-        }
-
-        .result-label {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-top: 0.25rem;
         }
     </style>
 </head>
@@ -1115,7 +1081,8 @@
     </div>
 
     <script>
-        const API_URL = 'http://localhost:3000';
+        // ✅ URL dinámica: funciona en localhost y en Render
+        const API_URL = window.location.origin;
 
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('fecha-cita').value = today;
@@ -1179,10 +1146,11 @@
 
         async function loadCitas() {
             const fecha = document.getElementById('filter-fecha').value;
+            const tbody = document.getElementById('tbody-citas');
+            
             try {
                 const res = await fetch(`${API_URL}/citas/${fecha}`);
                 const result = await res.json();
-                const tbody = document.getElementById('tbody-citas');
 
                 if (!result.datos || result.datos.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-calendar-day"></i><br>No hay citas para este día</td></tr>';
@@ -1289,10 +1257,11 @@
         }
 
         async function loadClientes() {
+            const tbody = document.getElementById('tbody-clientes');
+            
             try {
                 const res = await fetch(`${API_URL}/clientes`);
                 const result = await res.json();
-                const tbody = document.getElementById('tbody-clientes');
 
                 if (!result.datos || result.datos.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-users"></i><br>No hay clientes registrados</td></tr>';
@@ -1388,10 +1357,11 @@
         }
 
         async function loadLogs() {
+            const tbody = document.getElementById('tbody-logs');
+            
             try {
                 const res = await fetch(`${API_URL}/admin/logs`);
                 const result = await res.json();
-                const tbody = document.getElementById('tbody-logs');
 
                 if (!result.datos || result.datos.length === 0) {
                     tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-inbox"></i><br>No hay envíos registrados</td></tr>';
