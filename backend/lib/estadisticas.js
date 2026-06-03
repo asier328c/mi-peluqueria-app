@@ -54,7 +54,7 @@ function resumenGeneral() {
     const totalClientes = db.prepare('SELECT COUNT(*) as count FROM clientes').get().count;
     const citasHoy = db.prepare("SELECT COUNT(*) as count FROM citas WHERE fecha = date('now')").get().count;
     const citasManana = db.prepare("SELECT COUNT(*) as count FROM citas WHERE fecha = date('now', '+1 day')").get().count;
-    const recordatoriosEnviados = db.prepare('SELECT COUNT(*) as count FROM logs_envio WHERE estado = "enviado"').get().count;
+    const recordatoriosEnviados = db.prepare("SELECT COUNT(*) as count FROM logs_envio WHERE estado = 'enviado'").get().count;
     const tasaExito = db.prepare(`
         SELECT 
             ROUND(
