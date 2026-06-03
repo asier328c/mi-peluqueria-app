@@ -3,8 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>✂️ Gestión de Citas - Peluquería</title>
+    <title>PeluAdmin Pro - Gestión Inteligente</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-card: rgba(30, 41, 59, 0.8);
+            --accent: #e94560;
+            --accent-hover: #ff6b6b;
+            --success: #00d9ff;
+            --warning: #f9a826;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --border: rgba(148, 163, 184, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -12,100 +29,426 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #f5f6fa;
-            color: #2c3e50;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        h1 {
-            text-align: center;
-            color: #e74c3c;
-            margin-bottom: 0.5rem;
+        /* Animación de fondo */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
         }
 
-        .subtitulo {
-            text-align: center;
-            color: #7f8c8d;
-            margin-bottom: 2rem;
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(233, 69, 96, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            top: -100px;
+            right: -100px;
+            animation: float 20s infinite ease-in-out;
         }
 
-        /* Formulario */
-        .formulario {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            margin-bottom: 2rem;
+        .bg-animation::after {
+            content: '';
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 217, 255, 0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: -150px;
+            left: -150px;
+            animation: float 25s infinite ease-in-out reverse;
         }
 
-        .formulario h2 {
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -30px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
         }
 
-        .campo {
-            margin-bottom: 1rem;
+        /* Header */
+        .header {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .campo label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logo i {
+            color: var(--accent);
+            font-size: 1.75rem;
+        }
+
+        .logo span {
+            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-secondary);
             font-size: 0.9rem;
         }
 
-        .campo input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid #ecf0f1;
-            border-radius: 8px;
-            font-size: 1rem;
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 0.75rem;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: var(--success);
         }
 
-        .campo input:focus {
-            outline: none;
-            border-color: #e74c3c;
+        .status-badge::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
         }
 
-        .btn-principal {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-size: 1rem;
-            cursor: pointer;
-            width: 100%;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
-        .btn-principal:hover {
-            background: #c0392b;
+        /* Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
         }
 
-        /* Lista de citas */
-        .lista-citas {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-        }
-
-        .lista-citas h2 {
-            margin-bottom: 1rem;
-            font-size: 1.2rem;
-        }
-
-        .filtro-fecha {
-            margin-bottom: 1rem;
-        }
-
-        .filtro-fecha input {
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background: var(--bg-secondary);
             padding: 0.5rem;
-            border: 2px solid #ecf0f1;
-            border-radius: 8px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 0.875rem 1.25rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab:hover {
+            color: var(--text-primary);
+            background: var(--glass);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--accent), #c73e54);
+            color: white;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .nav-tab i {
+            font-size: 1rem;
+        }
+
+        /* Sections */
+        .section {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .card-title i {
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+        }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(233, 69, 96, 0.15);
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            background: rgba(233, 69, 96, 0.1);
+            color: var(--accent);
+        }
+
+        .stat-icon.blue {
+            background: rgba(0, 217, 255, 0.1);
+            color: var(--success);
+        }
+
+        .stat-icon.yellow {
+            background: rgba(249, 168, 38, 0.1);
+            color: var(--warning);
+        }
+
+        .stat-icon.green {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        .stat-value {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .stat-change {
+            font-size: 0.8rem;
+            margin-top: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .stat-change.positive {
+            color: #22c55e;
+        }
+
+        .stat-change.negative {
+            color: var(--accent);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(233, 69, 96, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.5;
+        }
+
+        textarea.form-input {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.875rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent), #c73e54);
+            color: white;
+            box-shadow: 0 4px 15px rgba(233, 69, 96, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: var(--glass);
+            border-color: var(--accent);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 12px;
         }
 
         table {
@@ -113,239 +456,1096 @@
             border-collapse: collapse;
         }
 
+        thead {
+            background: var(--bg-primary);
+        }
+
         th {
             text-align: left;
-            padding: 0.75rem;
-            border-bottom: 2px solid #ecf0f1;
-            color: #7f8c8d;
-            font-size: 0.85rem;
+            padding: 1rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            border-bottom: 1px solid var(--border);
         }
 
         td {
-            padding: 0.75rem;
-            border-bottom: 1px solid #ecf0f1;
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
         }
 
-        .estado-pendiente {
-            color: #f39c12;
-            font-weight: bold;
+        tr {
+            transition: background 0.2s ease;
         }
 
-        .estado-confirmado {
-            color: #27ae60;
-            font-weight: bold;
+        tr:hover {
+            background: var(--glass);
         }
 
-        .estado-cancelado {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-
-        .btn-eliminar {
-            background: #e74c3c;
-            color: white;
-            border: none;
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
             padding: 0.35rem 0.75rem;
-            border-radius: 4px;
-            cursor: pointer;
+            border-radius: 20px;
             font-size: 0.8rem;
+            font-weight: 600;
         }
 
-        .mensaje-exito {
-            background: #d4edda;
-            color: #155724;
-            padding: 1rem;
-            border-radius: 8px;
+        .badge-pending {
+            background: rgba(249, 168, 38, 0.15);
+            color: var(--warning);
+        }
+
+        .badge-confirmed {
+            background: rgba(34, 197, 94, 0.15);
+            color: #22c55e;
+        }
+
+        .badge-cancelled {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        .badge-sent {
+            background: rgba(0, 217, 255, 0.15);
+            color: var(--success);
+        }
+
+        .badge-failed {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+        }
+
+        /* Charts */
+        .chart-bar {
+            display: flex;
+            align-items: center;
             margin-bottom: 1rem;
-            display: none;
+            gap: 1rem;
         }
 
-        .mensaje-error {
-            background: #f8d7da;
-            color: #721c24;
-            padding: 1rem;
+        .chart-label {
+            width: 100px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .chart-track {
+            flex: 1;
+            height: 28px;
+            background: var(--bg-primary);
             border-radius: 8px;
-            margin-bottom: 1rem;
-            display: none;
+            overflow: hidden;
+            position: relative;
         }
 
-        .sin-citas {
+        .chart-fill {
+            height: 100%;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 0.75rem;
+            color: white;
+            font-size: 0.8rem;
+            font-weight: 700;
+            transition: width 1s ease;
+            background: linear-gradient(90deg, var(--accent), var(--accent-hover));
+        }
+
+        .chart-fill.blue {
+            background: linear-gradient(90deg, var(--success), #00b4d8);
+        }
+
+        .chart-fill.green {
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+        }
+
+        .chart-fill.yellow {
+            background: linear-gradient(90deg, var(--warning), #f59e0b);
+        }
+
+        /* Suggestions */
+        .suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            max-height: 250px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+            box-shadow: var(--shadow);
+        }
+
+        .suggestions.visible {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 1rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s ease;
+        }
+
+        .suggestion-item:hover {
+            background: var(--glass);
+        }
+
+        .suggestion-name {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .suggestion-phone {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Messages */
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        .alert.visible {
+            display: flex;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .alert-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Empty state */
+        .empty-state {
             text-align: center;
-            color: #7f8c8d;
-            padding: 2rem;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .nav-tab {
+                font-size: 0.8rem;
+                padding: 0.75rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+            
+            .logo {
+                font-size: 1.25rem;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Info box */
+        .info-box {
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.15);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .info-box code {
+            background: var(--bg-primary);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            color: var(--success);
+            font-size: 0.85rem;
+        }
+
+        /* Result summary */
+        .result-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .result-box {
+            background: var(--bg-primary);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .result-number {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .result-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
         }
     </style>
 </head>
 <body>
-    <h1>✂️ Gestión de Citas</h1>
-    <p class="subtitulo">Peluquería - Recordatorios automáticos por WhatsApp</p>
+    <div class="bg-animation"></div>
 
-    <div class="mensaje-exito" id="mensaje-exito">¡Cita guardada correctamente!</div>
-    <div class="mensaje-error" id="mensaje-error">Error al guardar la cita.</div>
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-cut"></i>
+            <span>PeluAdmin</span> Pro
+        </div>
+        <div class="user-info">
+            <span class="status-badge">Sistema Activo</span>
+            <span id="current-date"></span>
+        </div>
+    </header>
 
-    <!-- Formulario para nueva cita -->
-    <div class="formulario">
-        <h2>📅 Nueva Cita</h2>
-        <form id="form-cita" onsubmit="guardarCita(event)">
-            <div class="campo">
-                <label for="nombre">Nombre del cliente *</label>
-                <input type="text" id="nombre" required placeholder="Ej: María García">
-            </div>
-
-            <div class="campo">
-                <label for="telefono">Teléfono (con prefijo) *</label>
-                <input type="tel" id="telefono" required placeholder="Ej: 34612345678">
-            </div>
-
-            <div class="campo">
-                <label for="fecha">Fecha *</label>
-                <input type="date" id="fecha" required>
-            </div>
-
-            <div class="campo">
-                <label for="hora">Hora *</label>
-                <input type="time" id="hora" required>
-            </div>
-
-            <div class="campo">
-                <label for="servicio">Servicio</label>
-                <input type="text" id="servicio" placeholder="Ej: Corte, tinte, mechas...">
-            </div>
-
-            <button type="submit" class="btn-principal">💾 Guardar Cita</button>
-        </form>
-    </div>
-
-    <!-- Lista de citas -->
-    <div class="lista-citas">
-        <h2>📋 Citas Programadas</h2>
-        
-        <div class="filtro-fecha">
-            <label for="filtro-fecha">Ver citas del día:</label>
-            <input type="date" id="filtro-fecha" onchange="cargarCitas()">
+    <div class="container">
+        <div class="alert alert-success" id="alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span id="alert-success-text">Operación exitosa</span>
+        </div>
+        <div class="alert alert-error" id="alert-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <span id="alert-error-text">Error en la operación</span>
         </div>
 
-        <table id="tabla-citas">
-            <thead>
-                <tr>
-                    <th>Hora</th>
-                    <th>Cliente</th>
-                    <th>Teléfono</th>
-                    <th>Servicio</th>
-                    <th>Estado</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody id="tbody-citas">
-                <tr>
-                    <td colspan="6" class="sin-citas">Cargando citas...</td>
-                </tr>
-            </tbody>
-        </table>
+        <nav class="nav-tabs">
+            <button class="nav-tab active" onclick="changeTab('citas')">
+                <i class="fas fa-calendar-alt"></i> Citas
+            </button>
+            <button class="nav-tab" onclick="changeTab('clientes')">
+                <i class="fas fa-users"></i> Clientes
+            </button>
+            <button class="nav-tab" onclick="changeTab('mensaje')">
+                <i class="fas fa-comment-dots"></i> Mensaje
+            </button>
+            <button class="nav-tab" onclick="changeTab('envios')">
+                <i class="fas fa-paper-plane"></i> Envíos
+            </button>
+            <button class="nav-tab" onclick="changeTab('stats')">
+                <i class="fas fa-chart-line"></i> Stats
+            </button>
+        </nav>
+
+        <!-- CITAS -->
+        <section id="section-citas" class="section active">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-plus-circle"></i>
+                        Nueva Cita
+                    </h2>
+                </div>
+                <form id="form-cita" onsubmit="saveCita(event)">
+                    <div class="form-group" style="position: relative;">
+                        <label class="form-label">Nombre del cliente *</label>
+                        <input type="text" class="form-input" id="nombre-cita" required 
+                               placeholder="Escribe para buscar..." oninput="searchClients(this.value)">
+                        <div class="suggestions" id="suggestions-clients"></div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Teléfono (con prefijo) *</label>
+                        <input type="tel" class="form-input" id="telefono-cita" required 
+                               placeholder="Ej: 34612345678">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label">Fecha *</label>
+                            <input type="date" class="form-input" id="fecha-cita" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Hora *</label>
+                            <input type="time" class="form-input" id="hora-cita" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Servicio</label>
+                        <input type="text" class="form-input" id="servicio-cita" 
+                               placeholder="Ej: Corte, tinte, mechas...">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-save"></i> Guardar Cita
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-list"></i>
+                        Citas Programadas
+                    </h2>
+                    <input type="date" class="form-input" id="filter-fecha" onchange="loadCitas()" 
+                           style="width: auto; display: inline-block;">
+                </div>
+                <div class="table-container">
+                    <table id="table-citas">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Cliente</th>
+                                <th>Teléfono</th>
+                                <th>Servicio</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-citas">
+                            <tr><td colspan="6" class="empty-state">
+                                <i class="fas fa-calendar-day"></i><br>Cargando citas...
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- CLIENTES -->
+        <section id="section-clientes" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-user-plus"></i>
+                        Nuevo Cliente
+                    </h2>
+                </div>
+                <form id="form-cliente" onsubmit="saveCliente(event)">
+                    <div class="form-group">
+                        <label class="form-label">Nombre completo *</label>
+                        <input type="text" class="form-input" id="nombre-cliente" required 
+                               placeholder="Ej: María García">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Teléfono (con prefijo) *</label>
+                        <input type="tel" class="form-input" id="telefono-cliente" required 
+                               placeholder="Ej: 34612345678">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Notas</label>
+                        <input type="text" class="form-input" id="notas-cliente" 
+                               placeholder="Ej: Prefiere mañanas, alérgica a...">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-save"></i> Guardar Cliente
+                    </button>
+                </form>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-address-book"></i>
+                        Agenda de Clientes
+                    </h2>
+                </div>
+                <div class="table-container">
+                    <table id="table-clientes">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Teléfono</th>
+                                <th>Notas</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-clientes">
+                            <tr><td colspan="4" class="empty-state">
+                                <i class="fas fa-users"></i><br>Cargando clientes...
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- MENSAJE -->
+        <section id="section-mensaje" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-edit"></i>
+                        Personalizar Mensaje de WhatsApp
+                    </h2>
+                </div>
+                <div class="info-box">
+                    <i class="fas fa-info-circle" style="margin-right: 0.5rem;"></i>
+                    Variables disponibles: 
+                    <code>{nombre}</code> <code>{fecha}</code> <code>{hora}</code> <code>{servicio}</code>
+                </div>
+                <form id="form-config" onsubmit="saveConfig(event)">
+                    <div class="form-group">
+                        <label class="form-label">Mensaje de recordatorio</label>
+                        <textarea class="form-input" id="mensaje-recordatorio" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-save"></i> Guardar Mensaje
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- ENVÍOS -->
+        <section id="section-envios" class="section">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-paper-plane"></i>
+                        Enviar Recordatorios
+                    </h2>
+                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    Envía recordatorios manualmente para una fecha específica.
+                </p>
+                <div class="form-group">
+                    <label class="form-label">Fecha de las citas</label>
+                    <input type="date" class="form-input" id="fecha-envio">
+                </div>
+                <button class="btn btn-success" onclick="sendRecordatorios()" style="width: 100%;">
+                    <i class="fas fa-paper-plane"></i> Enviar Recordatorios
+                </button>
+                <div id="result-envio" style="margin-top: 1rem;"></div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-history"></i>
+                        Historial de Envíos
+                    </h2>
+                </div>
+                <div class="table-container">
+                    <table id="table-logs">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Cliente</th>
+                                <th>Estado</th>
+                                <th>Mensaje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-logs">
+                            <tr><td colspan="4" class="empty-state">
+                                <i class="fas fa-inbox"></i><br>Cargando historial...
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- STATS -->
+        <section id="section-stats" class="section">
+            <div class="stats-grid" id="stats-resumen">
+                <div class="stat-card">
+                    <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                    <div class="stat-value">-</div>
+                    <div class="stat-label">Total Citas</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                    <div class="stat-value">-</div>
+                    <div class="stat-label">Clientes</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon yellow"><i class="fas fa-sun"></i></div>
+                    <div class="stat-value">-</div>
+                    <div class="stat-label">Hoy</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fas fa-clock"></i></div>
+                    <div class="stat-value">-</div>
+                    <div class="stat-label">Mañana</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon blue"><i class="fab fa-whatsapp"></i></div>
+                    <div class="stat-value">-</div>
+                    <div class="stat-label">WhatsApps Enviados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon green"><i class="fas fa-percentage"></i></div>
+                    <div class="stat-value">-%</div>
+                    <div class="stat-label">Tasa de Éxito</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-trophy"></i>
+                        Clientes Más Frecuentes
+                    </h2>
+                </div>
+                <div class="table-container">
+                    <table id="table-top-clientes">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Cliente</th>
+                                <th>Citas</th>
+                                <th>Última Cita</th>
+                                <th>WhatsApps</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-top-clientes">
+                            <tr><td colspan="5" class="empty-state">
+                                <i class="fas fa-crown"></i><br>Cargando...
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-chart-pie"></i>
+                        Servicios Más Solicitados
+                    </h2>
+                </div>
+                <div id="chart-servicios">
+                    <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><br>Cargando...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-calendar-alt"></i>
+                        Citas por Mes
+                    </h2>
+                </div>
+                <div class="table-container">
+                    <table id="table-citas-mes">
+                        <thead>
+                            <tr>
+                                <th>Mes</th>
+                                <th>Total</th>
+                                <th>Recordatorios</th>
+                                <th>Confirmadas</th>
+                                <th>Canceladas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbody-citas-mes">
+                            <tr><td colspan="5" class="empty-state">
+                                <i class="fas fa-calendar"></i><br>Cargando...
+                            </td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Días Más Ocupados
+                    </h2>
+                </div>
+                <div id="chart-dias">
+                    <div class="empty-state"><i class="fas fa-spinner fa-spin"></i><br>Cargando...</div>
+                </div>
+            </div>
+        </section>
     </div>
 
     <script>
-        const API_URL = 'https://mi-peluqueria-app.onrender.com';
+        const API_URL = 'http://localhost:3000';
 
-        // Poner fecha de hoy en el filtro
-        document.getElementById('filtro-fecha').value = new Date().toISOString().split('T')[0];
-
-        // Cargar citas al iniciar
-        document.addEventListener('DOMContentLoaded', () => {
-            cargarCitas();
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('fecha-cita').value = today;
+        document.getElementById('filter-fecha').value = today;
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('es-ES', {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
         });
 
-        async function guardarCita(event) {
-            event.preventDefault();
+        function changeTab(tab) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(`section-${tab}`).classList.add('active');
+            event.currentTarget.classList.add('active');
 
+            if (tab === 'citas') loadCitas();
+            if (tab === 'clientes') loadClientes();
+            if (tab === 'mensaje') loadConfig();
+            if (tab === 'envios') loadLogs();
+            if (tab === 'stats') loadStats();
+        }
+
+        function showAlert(type, text) {
+            const div = document.getElementById(`alert-${type}`);
+            document.getElementById(`alert-${type}-text`).textContent = text;
+            div.classList.add('visible');
+            setTimeout(() => div.classList.remove('visible'), 3000);
+        }
+
+        // ========== CITAS ==========
+        async function saveCita(event) {
+            event.preventDefault();
             const cita = {
-                nombre: document.getElementById('nombre').value,
-                telefono: document.getElementById('telefono').value,
-                fecha: document.getElementById('fecha').value,
-                hora: document.getElementById('hora').value,
-                servicio: document.getElementById('servicio').value
+                nombre: document.getElementById('nombre-cita').value,
+                telefono: document.getElementById('telefono-cita').value,
+                fecha: document.getElementById('fecha-cita').value,
+                hora: document.getElementById('hora-cita').value,
+                servicio: document.getElementById('servicio-cita').value
             };
 
             try {
-                const response = await fetch(`${API_URL}/citas`, {
+                const res = await fetch(`${API_URL}/citas`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(cita)
                 });
+                const result = await res.json();
 
-                const resultado = await response.json();
-
-                if (resultado.exito) {
-                    mostrarMensaje('exito');
+                if (result.exito) {
+                    showAlert('success', 'Cita guardada correctamente');
                     document.getElementById('form-cita').reset();
-                    cargarCitas();
+                    document.getElementById('fecha-cita').value = today;
+                    loadCitas();
                 } else {
-                    mostrarMensaje('error');
+                    showAlert('error', result.mensaje);
                 }
             } catch (error) {
-                console.error('Error:', error);
-                mostrarMensaje('error');
+                showAlert('error', 'Error de conexión');
             }
         }
 
-        async function cargarCitas() {
-            const fecha = document.getElementById('filtro-fecha').value;
-            
+        async function loadCitas() {
+            const fecha = document.getElementById('filter-fecha').value;
             try {
-                const response = await fetch(`${API_URL}/citas/${fecha}`);
-                const resultado = await response.json();
-
+                const res = await fetch(`${API_URL}/citas/${fecha}`);
+                const result = await res.json();
                 const tbody = document.getElementById('tbody-citas');
-                
-                if (resultado.datos.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" class="sin-citas">No hay citas para este día</td></tr>';
+
+                if (!result.datos || result.datos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-calendar-day"></i><br>No hay citas para este día</td></tr>';
                     return;
                 }
 
-                tbody.innerHTML = resultado.datos.map(cita => `
+                tbody.innerHTML = result.datos.map(cita => `
                     <tr>
-                        <td>${cita.hora}</td>
+                        <td><strong>${cita.hora}</strong></td>
                         <td>${cita.nombre}</td>
                         <td>${cita.telefono}</td>
                         <td>${cita.servicio || '-'}</td>
-                        <td class="estado-${cita.estado}">${cita.estado}</td>
-                        <td>
-                            <button class="btn-eliminar" onclick="eliminarCita(${cita.id})">🗑️</button>
-                        </td>
+                        <td><span class="badge badge-${cita.estado === 'pendiente' ? 'pending' : cita.estado === 'confirmada' ? 'confirmed' : 'cancelled'}">${cita.estado}</span></td>
+                        <td><button class="btn btn-danger btn-sm" onclick="deleteCita(${cita.id})"><i class="fas fa-trash"></i></button></td>
                     </tr>
                 `).join('');
             } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('tbody-citas').innerHTML = 
-                    '<tr><td colspan="6" class="sin-citas">Error al cargar citas</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fas fa-exclamation-triangle"></i><br>Error al cargar</td></tr>';
             }
         }
 
-        async function eliminarCita(id) {
+        async function deleteCita(id) {
             if (!confirm('¿Eliminar esta cita?')) return;
+            try {
+                await fetch(`${API_URL}/citas/${id}`, { method: 'DELETE' });
+                loadCitas();
+            } catch (error) {
+                showAlert('error', 'Error al eliminar');
+            }
+        }
+
+        // ========== AUTOCOMPLETADO ==========
+        let clientsCache = [];
+
+        async function searchClients(text) {
+            const suggestions = document.getElementById('suggestions-clients');
+            
+            if (text.length < 2) {
+                suggestions.classList.remove('visible');
+                return;
+            }
 
             try {
-                const response = await fetch(`${API_URL}/citas/${id}`, {
-                    method: 'DELETE'
-                });
+                const res = await fetch(`${API_URL}/clientes/buscar/${encodeURIComponent(text)}`);
+                const result = await res.json();
+                clientsCache = result.datos || [];
 
-                const resultado = await response.json();
-                
-                if (resultado.exito) {
-                    cargarCitas();
+                if (clientsCache.length === 0) {
+                    suggestions.classList.remove('visible');
+                    return;
                 }
+
+                suggestions.innerHTML = clientsCache.map(c => `
+                    <div class="suggestion-item" onclick="selectClient('${c.nombre}', '${c.telefono}')">
+                        <div class="suggestion-name">${c.nombre}</div>
+                        <div class="suggestion-phone">${c.telefono}</div>
+                    </div>
+                `).join('');
+                suggestions.classList.add('visible');
             } catch (error) {
-                console.error('Error:', error);
+                suggestions.classList.remove('visible');
             }
         }
 
-        function mostrarMensaje(tipo) {
-            const div = document.getElementById(`mensaje-${tipo}`);
-            div.style.display = 'block';
-            setTimeout(() => {
-                div.style.display = 'none';
-            }, 3000);
+        function selectClient(name, phone) {
+            document.getElementById('nombre-cita').value = name;
+            document.getElementById('telefono-cita').value = phone;
+            document.getElementById('suggestions-clients').classList.remove('visible');
         }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.form-group')) {
+                document.getElementById('suggestions-clients').classList.remove('visible');
+            }
+        });
+
+        // ========== CLIENTES ==========
+        async function saveCliente(event) {
+            event.preventDefault();
+            const cliente = {
+                nombre: document.getElementById('nombre-cliente').value,
+                telefono: document.getElementById('telefono-cliente').value,
+                notas: document.getElementById('notas-cliente').value
+            };
+
+            try {
+                const res = await fetch(`${API_URL}/clientes`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(cliente)
+                });
+                const result = await res.json();
+
+                if (result.exito) {
+                    showAlert('success', 'Cliente guardado correctamente');
+                    document.getElementById('form-cliente').reset();
+                    loadClientes();
+                } else {
+                    showAlert('error', result.mensaje);
+                }
+            } catch (error) {
+                showAlert('error', 'Error de conexión');
+            }
+        }
+
+        async function loadClientes() {
+            try {
+                const res = await fetch(`${API_URL}/clientes`);
+                const result = await res.json();
+                const tbody = document.getElementById('tbody-clientes');
+
+                if (!result.datos || result.datos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-users"></i><br>No hay clientes registrados</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = result.datos.map(c => `
+                    <tr>
+                        <td><strong>${c.nombre}</strong></td>
+                        <td>${c.telefono}</td>
+                        <td>${c.notas || '-'}</td>
+                        <td><button class="btn btn-danger btn-sm" onclick="alert('Eliminar no implementado')"><i class="fas fa-trash"></i></button></td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-exclamation-triangle"></i><br>Error al cargar</td></tr>';
+            }
+        }
+
+        // ========== CONFIG ==========
+        async function loadConfig() {
+            try {
+                const res = await fetch(`${API_URL}/config/mensaje`);
+                const result = await res.json();
+                if (result.exito) {
+                    document.getElementById('mensaje-recordatorio').value = result.mensaje;
+                }
+            } catch (error) {
+                showAlert('error', 'Error al cargar configuración');
+            }
+        }
+
+        async function saveConfig(event) {
+            event.preventDefault();
+            try {
+                const res = await fetch(`${API_URL}/config/mensaje`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        mensaje_recordatorio: document.getElementById('mensaje-recordatorio').value
+                    })
+                });
+                const result = await res.json();
+                if (result.exito) {
+                    showAlert('success', 'Mensaje actualizado correctamente');
+                } else {
+                    showAlert('error', result.mensaje);
+                }
+            } catch (error) {
+                showAlert('error', 'Error de conexión');
+            }
+        }
+
+        // ========== ENVÍOS ==========
+        async function sendRecordatorios() {
+            const fecha = document.getElementById('fecha-envio').value;
+            const resultDiv = document.getElementById('result-envio');
+            
+            resultDiv.innerHTML = '<div class="empty-state"><div class="loading"></div><br>Enviando...</div>';
+            
+            try {
+                const res = await fetch(`${API_URL}/admin/enviar-recordatorios`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(fecha ? { fecha } : {})
+                });
+                const result = await res.json();
+                
+                if (result.exito) {
+                    resultDiv.innerHTML = `
+                        <div class="result-summary">
+                            <div class="result-box">
+                                <div class="result-number">${result.total}</div>
+                                <div class="result-label">Total citas</div>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-number" style="color: #22c55e;">${result.enviados}</div>
+                                <div class="result-label">Enviados</div>
+                            </div>
+                            <div class="result-box">
+                                <div class="result-number" style="color: #ef4444;">${result.fallidos}</div>
+                                <div class="result-label">Fallidos</div>
+                            </div>
+                        </div>
+                    `;
+                    loadLogs();
+                } else {
+                    resultDiv.innerHTML = `<div class="alert alert-error visible"><i class="fas fa-exclamation-circle"></i> ${result.mensaje}</div>`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="alert alert-error visible"><i class="fas fa-exclamation-circle"></i> Error de conexión</div>';
+            }
+        }
+
+        async function loadLogs() {
+            try {
+                const res = await fetch(`${API_URL}/admin/logs`);
+                const result = await res.json();
+                const tbody = document.getElementById('tbody-logs');
+
+                if (!result.datos || result.datos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-inbox"></i><br>No hay envíos registrados</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = result.datos.slice(0, 50).map(l => `
+                    <tr>
+                        <td>${new Date(l.creado_en).toLocaleString('es-ES')}</td>
+                        <td>${l.telefono}</td>
+                        <td><span class="badge badge-${l.estado === 'enviado' ? 'sent' : 'failed'}">${l.estado}</span></td>
+                        <td style="font-size: 0.85rem; max-width: 300px; overflow: hidden; text-overflow: ellipsis;">${l.mensaje}</td>
+                    </tr>
+                `).join('');
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fas fa-exclamation-triangle"></i><br>Error al cargar</td></tr>';
+            }
+        }
+
+        // ========== STATS ==========
+        async function loadStats() {
+            try {
+                const resResumen = await fetch(`${API_URL}/stats/resumen`);
+                const resumen = await resResumen.json();
+                
+                if (resumen.exito) {
+                    const d = resumen.datos;
+                    const cards = document.getElementById('stats-resumen');
+                    cards.innerHTML = `
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+                            <div class="stat-value">${d.total_citas}</div>
+                            <div class="stat-label">Total Citas</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue"><i class="fas fa-users"></i></div>
+                            <div class="stat-value">${d.total_clientes}</div>
+                            <div class="stat-label">Clientes</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon yellow"><i class="fas fa-sun"></i></div>
+                            <div class="stat-value">${d.citas_hoy}</div>
+                            <div class="stat-label">Hoy</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green"><i class="fas fa-clock"></i></div>
+                            <div class="stat-value">${d.citas_manana}</div>
+                            <div class="stat-label">Mañana</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon blue"><i class="fab fa-whatsapp"></i></div>
+                            <div class="stat-value">${d.recordatorios_enviados}</div>
+                            <div class="stat-label">WhatsApps Enviados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green"><i class="fas fa-percentage"></i></div>
+                            <div class="stat-value">${d.tasa_exito}%</div>
+                            <div class="stat-label">Tasa de Éxito</div>
+                        </div>
+                    `;
+                }
+
+                const resTop = await fetch(`${API_URL}/stats/clientes-top`);
+                const top = await resTop.json();
+                
+                if (top.exito) {
+                    const tbody = document.getElementById('tbody-top-clientes');
+                    if (top.datos.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-crown"></i><br>No hay datos</td></tr>';
+                    } else {
+                        tbody.innerHTML = top.datos.map((c, i) => `
+                            <tr>
+                                <td>${i < 3 ? '<span style="color: ' + (i===0?'#f9a826':i===1?'#94a3b8':'#cd7f32') + '; font-size: 1.2rem;"><i class="fas fa-medal"></i></span>' : (i+1) + 'º'}</td>
+                                <td><strong>${c.nombre}</strong></td>
+                                <td>${c.total_citas}</td>
+                                <td>${new Date(c.ultima_cita).toLocaleDateString('es-ES')}</td>
+                                <td>${c.recordatorios_recibidos}</td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+
+                const resServ = await fetch(`${API_URL}/stats/servicios`);
+                const serv = await resServ.json();
+                
+                if (serv.exito) {
+                    const container = document.getElementById('chart-servicios');
+                    if (serv.datos.length === 0) {
+                        container.innerHTML = '<div class="empty-state"><i class="fas fa-chart-pie"></i><br>No hay datos</div>';
+                    } else {
+                        const max = Math.max(...serv.datos.map(s => s.total));
+                        container.innerHTML = serv.datos.map((s, i) => `
+                            <div class="chart-bar">
+                                <div class="chart-label">${s.servicio}</div>
+                                <div class="chart-track">
+                                    <div class="chart-fill ${i===0?'green':i===1?'blue':i===2?'yellow':''}" style="width: ${(s.total/max*100)}%">
+                                        ${s.total} (${s.porcentaje}%)
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+
+                const resMes = await fetch(`${API_URL}/stats/citas-mes`);
+                const mes = await resMes.json();
+                
+                if (mes.exito) {
+                    const tbody = document.getElementById('tbody-citas-mes');
+                    if (mes.datos.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fas fa-calendar"></i><br>No hay datos</td></tr>';
+                    } else {
+                        tbody.innerHTML = mes.datos.map(m => `
+                            <tr>
+                                <td><strong>${m.mes}</strong></td>
+                                <td>${m.total}</td>
+                                <td>${m.recordatorios_enviados}</td>
+                                <td>${m.confirmadas}</td>
+                                <td>${m.canceladas}</td>
+                            </tr>
+                        `).join('');
+                    }
+                }
+
+                const resDias = await fetch(`${API_URL}/stats/dias-semana`);
+                const dias = await resDias.json();
+                
+                if (dias.exito) {
+                    const container = document.getElementById('chart-dias');
+                    if (dias.datos.length === 0) {
+                        container.innerHTML = '<div class="empty-state"><i class="fas fa-chart-bar"></i><br>No hay datos</div>';
+                    } else {
+                        const max = Math.max(...dias.datos.map(d => d.total));
+                        container.innerHTML = dias.datos.map((d, i) => `
+                            <div class="chart-bar">
+                                <div class="chart-label">${d.dia}</div>
+                                <div class="chart-track">
+                                    <div class="chart-fill" style="width: ${(d.total/max*100)}%">
+                                        ${d.total}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+
+            } catch (error) {
+                console.error('Error cargando stats:', error);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCitas();
+        });
     </script>
 </body>
 </html>

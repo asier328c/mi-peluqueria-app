@@ -1,168 +1,297 @@
-// ============================================
-// SERVIDOR DE RECORDATORIOS DE CITAS
-// ============================================
-
 const express = require('express');
 const cors = require('cors');
-const Database = require('better-sqlite3');
 const path = require('path');
 const cron = require('node-cron');
-const axios = require('axios');
+const db = require('./lib/db');
+const { 
+    enviarRecordatorios, 
+    reintentarFallidos, 
+    normalizarFecha, 
+    obtenerFechaManana,
+    buscarOCrearCliente,
+    buscarClientePorNombre,
+    obtenerClientes,
+    obtenerMensajeConfig
+} = require('./lib/recordatorios');
+const {
+    citasPorMes,
+    clientesTop,
+    serviciosTop,
+    resumenGeneral,
+    citasPorDiaSemana,
+    enviosPorDia
+} = require('./lib/estadisticas');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Servir archivos estaticos (frontend)
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 // ============================================
-// BASE DE DATOS SQLITE
+// RUTAS DE CLIENTES
 // ============================================
-const dbPath = path.join(__dirname, 'citas.db');
-const db = new Database(dbPath);
 
-// Crear tabla de citas
-db.exec(`CREATE TABLE IF NOT EXISTS citas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nombre TEXT NOT NULL,
-    telefono TEXT NOT NULL,
-    fecha TEXT NOT NULL,
-    hora TEXT NOT NULL,
-    servicio TEXT,
-    estado TEXT DEFAULT 'pendiente',
-    recordatorio_enviado INTEGER DEFAULT 0,
-    creado_en DATETIME DEFAULT CURRENT_TIMESTAMP
-)`);
+app.get('/clientes', (req, res) => {
+    const clientes = obtenerClientes();
+    res.json({ exito: true, datos: clientes });
+});
 
-// ============================================
-// CONFIGURACION WHATSAPP (WasenderAPI)
-// ============================================
-const WASENDER_API_KEY = 'ffc100942001784806c639447aadbe43dd4c4d9c12ac4da37392d35b80ab5989';
+app.get('/clientes/buscar/:nombre', (req, res) => {
+    const { nombre } = req.params;
+    const clientes = buscarClientePorNombre(nombre);
+    res.json({ exito: true, datos: clientes });
+});
 
-// Funcion para enviar WhatsApp
-async function enviarWhatsApp(telefono, mensaje) {
+app.post('/clientes', (req, res) => {
+    const { nombre, telefono, notas } = req.body;
+    
+    if (!nombre || !telefono) {
+        return res.status(400).json({ exito: false, mensaje: 'Nombre y teléfono son obligatorios' });
+    }
+
     try {
-        const url = 'https://wasenderapi.com/api/send-message';
+        const cliente = buscarOCrearCliente(nombre, telefono);
         
-        const response = await axios.post(url, {
-            to: '+' + telefono,
-            text: mensaje
-        }, {
-            headers: {
-                'Authorization': 'Bearer ' + WASENDER_API_KEY,
-                'Content-Type': 'application/json'
-            }
+        if (notas) {
+            db.prepare('UPDATE clientes SET notas = ? WHERE id = ?').run(notas, cliente.id);
+        }
+        
+        res.json({ 
+            exito: true, 
+            mensaje: 'Cliente guardado',
+            datos: cliente 
         });
-        
-        console.log(`WhatsApp enviado a ${telefono}:`, response.data);
-        return true;
     } catch (error) {
-        console.error(`Error enviando a ${telefono}:`, error.response?.data || error.message);
-        return false;
+        res.status(400).json({ exito: false, mensaje: error.message });
     }
-}
+});
 
 // ============================================
-// FUNCION AUXILIAR: Convertir fecha dd/mm/aaaa a yyyy-mm-dd
-// ============================================
-function convertirFecha(fecha) {
-    // Si ya viene en formato yyyy-mm-dd, la devuelve igual
-    if (fecha.includes('-') && fecha.length === 10) {
-        return fecha;
-    }
-    
-    // Si viene en formato dd/mm/aaaa, la convierte
-    if (fecha.includes('/')) {
-        const partes = fecha.split('/');
-        // partes[0] = dia, partes[1] = mes, partes[2] = año
-        return `${partes[2]}-${partes[1].padStart(2, '0')}-${partes[0].padStart(2, '0')}`;
-    }
-    
-    // Si no reconoce el formato, devuelve la fecha original
-    return fecha;
-}
-
-// ============================================
-// RUTAS API
+// RUTAS DE CONFIGURACIÓN
 // ============================================
 
-// Crear nueva cita
-app.post('/citas', (req, res) => {
-    const { nombre, telefono, fecha, hora, servicio } = req.body;
-    
-    if (!nombre || !telefono || !fecha || !hora) {
-        return res.status(400).json({ exito: false, mensaje: 'Faltan datos obligatorios' });
-    }
-
-    // Convertir fecha al formato correcto
-    const fechaFormateada = convertirFecha(fecha);
-
-    const stmt = db.prepare('INSERT INTO citas (nombre, telefono, fecha, hora, servicio) VALUES (?, ?, ?, ?, ?)');
-    const result = stmt.run(nombre, telefono, fechaFormateada, hora, servicio || '');
-    
+app.get('/config/mensaje', (req, res) => {
+    const config = obtenerMensajeConfig();
     res.json({ 
         exito: true, 
-        mensaje: 'Cita guardada',
-        id: result.lastInsertRowid 
+        mensaje: config,
+        variables: '{nombre}, {fecha}, {hora}, {servicio}'
     });
 });
 
-// Obtener citas de una fecha
-app.get('/citas/:fecha', (req, res) => {
-    const { fecha } = req.params;
-    const stmt = db.prepare('SELECT * FROM citas WHERE fecha = ? ORDER BY hora');
-    const citas = stmt.all(fecha);
-    res.json({ exito: true, datos: citas });
+app.post('/config/mensaje', (req, res) => {
+    const { mensaje_recordatorio, mensaje_confirmacion } = req.body;
+    
+    if (!mensaje_recordatorio) {
+        return res.status(400).json({ exito: false, mensaje: 'El mensaje de recordatorio es obligatorio' });
+    }
+
+    try {
+        const stmt = db.prepare(`
+            UPDATE config_mensajes 
+            SET mensaje_recordatorio = ?, 
+                mensaje_confirmacion = ?,
+                actualizado_en = CURRENT_TIMESTAMP
+            WHERE id = 1
+        `);
+        stmt.run(mensaje_recordatorio, mensaje_confirmacion || '');
+        
+        res.json({ 
+            exito: true, 
+            mensaje: 'Mensaje actualizado correctamente' 
+        });
+    } catch (error) {
+        res.status(500).json({ exito: false, mensaje: error.message });
+    }
 });
 
-// Obtener todas las citas
+// ============================================
+// RUTAS DE CITAS
+// ============================================
+
+app.post('/citas', (req, res) => {
+    const { nombre, telefono, fecha, hora, servicio } = req.body;
+    
+    if (!nombre || !fecha || !hora) {
+        return res.status(400).json({ exito: false, mensaje: 'Nombre, fecha y hora son obligatorios' });
+    }
+
+    try {
+        const fechaNormalizada = normalizarFecha(fecha);
+        
+        let telefonoFinal = telefono;
+        if (!telefonoFinal) {
+            const clientes = buscarClientePorNombre(nombre);
+            if (clientes.length > 0) {
+                telefonoFinal = clientes[0].telefono;
+            } else {
+                return res.status(400).json({ 
+                    exito: false, 
+                    mensaje: 'Teléfono no proporcionado y cliente no encontrado' 
+                });
+            }
+        }
+        
+        buscarOCrearCliente(nombre, telefonoFinal);
+        
+        const stmt = db.prepare(`
+            INSERT INTO citas (nombre, telefono, fecha, hora, servicio) 
+            VALUES (?, ?, ?, ?, ?)
+        `);
+        const result = stmt.run(nombre, telefonoFinal, fechaNormalizada, hora, servicio || '');
+        
+        res.json({ 
+            exito: true, 
+            mensaje: 'Cita guardada',
+            id: result.lastInsertRowid,
+            telefono_usado: telefonoFinal
+        });
+        
+    } catch (error) {
+        res.status(400).json({ exito: false, mensaje: error.message });
+    }
+});
+
+app.get('/citas/:fecha', (req, res) => {
+    const { fecha } = req.params;
+    try {
+        const fechaNormalizada = normalizarFecha(fecha);
+        const stmt = db.prepare('SELECT * FROM citas WHERE fecha = ? ORDER BY hora');
+        const citas = stmt.all(fechaNormalizada);
+        res.json({ exito: true, datos: citas });
+    } catch (error) {
+        res.status(400).json({ exito: false, mensaje: error.message });
+    }
+});
+
 app.get('/citas', (req, res) => {
     const stmt = db.prepare('SELECT * FROM citas ORDER BY fecha DESC, hora DESC');
     const citas = stmt.all();
     res.json({ exito: true, datos: citas });
 });
 
-// Eliminar cita
 app.delete('/citas/:id', (req, res) => {
     const { id } = req.params;
     const stmt = db.prepare('DELETE FROM citas WHERE id = ?');
-    stmt.run(id);
+    const result = stmt.run(id);
+    
+    if (result.changes === 0) {
+        return res.status(404).json({ exito: false, mensaje: 'Cita no encontrada' });
+    }
+    
     res.json({ exito: true, mensaje: 'Cita eliminada' });
 });
 
 // ============================================
-// ROBOT DE RECORDATORIOS (Cron Job)
+// RUTAS DE ESTADÍSTICAS (NUEVO)
 // ============================================
-// Se ejecuta todos los dias a las 9:00 de la manana
-cron.schedule('0 9 * * *', () => {
-    console.log('🤖 Enviando recordatorios...');
-    enviarRecordatorios();
+
+app.get('/stats/resumen', (req, res) => {
+    try {
+        const datos = resumenGeneral();
+        res.json({ exito: true, datos });
+    } catch (error) {
+        res.status(500).json({ exito: false, mensaje: error.message });
+    }
 });
 
-function enviarRecordatorios() {
-    // Calcular manana
-    const manana = new Date();
-    manana.setDate(manana.getDate() + 1);
-    const fechaManana = manana.toISOString().split('T')[0];
+app.get('/stats/citas-mes', (req, res) => {
+    try {
+        const datos = citasPorMes();
+        res.json({ exito: true, datos });
+    } catch (error) {
+        res.status(500).json({ exito: false, mensaje: error.message });
+    }
+});
 
-    // Buscar citas de manana que no tengan recordatorio enviado
-    const stmt = db.prepare('SELECT * FROM citas WHERE fecha = ? AND recordatorio_enviado = 0');
-    const citas = stmt.all(fechaManana);
+app.get('/stats/clientes-top', (req, res) => {
+    try {
+        const datos = clientesTop();
+        res.json({ exito: true, datos });
+    } catch (error) {
+        res.status(500).json({ exito: false, mensaje: error.message });
+    }
+});
 
-    console.log(`Encontradas ${citas.length} citas para manana (${fechaManana})`);
+app.get('/stats/servicios', (req, res) => {
+    try {
+        const datos = serviciosTop();
+        res.json({ exito: true, datos });
+    } catch (error) {
+        res.status(500).json({ exito: false, mensaje: error.message });
+    }
+});
 
-    citas.forEach(cita => {
-        const mensaje = `Hola ${cita.nombre}, le recordamos su cita manana ${cita.fecha} a las ${cita.hora} en nuestra peluqueria. Por favor confirme con un SI si va a venir. Gracias.`;
-        
-        enviarWhatsApp(cita.telefono, mensaje).then(enviado => {
-            if (enviado) {
-                const update = db.prepare('UPDATE citas SET recordatorio_enviado = 1 WHERE id = ?');
-                update.run(cita.id);
-            }
-        });
-    });
-}
+app.get('/stats/dias-semana', (req, res) => {
+    try {
+        const datos = citasPorDiaSemana();
+        res.json({ exito: true, datos });
+    } catch (error) {
+        res.status(500).json({ exito: false, mensaje: error.message });
+    }
+});
+
+app.get('/stats/envios', (req, res) => {
+    try {
+        const datos = enviosPorDia();
+        res.json({ exito: true, datos });
+    } catch (error) {
+        res.status(500).json({ exito: false, mensaje: error.message });
+    }
+});
+
+// ============================================
+// ADMINISTRACIÓN
+// ============================================
+
+app.post('/admin/enviar-recordatorios', async (req, res) => {
+    const { fecha } = req.body;
+    
+    try {
+        console.log('👤 Envío manual solicitado via API');
+        const resultado = await enviarRecordatorios(fecha);
+        res.json({ exito: true, ...resultado });
+    } catch (error) {
+        res.status(500).json({ exito: false, mensaje: error.message });
+    }
+});
+
+app.get('/admin/logs', (req, res) => {
+    const stmt = db.prepare(`
+        SELECT * FROM logs_envio 
+        ORDER BY creado_en DESC 
+        LIMIT 100
+    `);
+    const logs = stmt.all();
+    res.json({ exito: true, datos: logs });
+});
+
+app.get('/admin/estadisticas', (req, res) => {
+    const hoy = new Date().toISOString().split('T')[0];
+    const stmt = db.prepare(`
+        SELECT estado, COUNT(*) as cantidad
+        FROM logs_envio
+        WHERE DATE(creado_en) = ?
+        GROUP BY estado
+    `);
+    const stats = stmt.all(hoy);
+    res.json({ exito: true, fecha: hoy, datos: stats });
+});
+
+// ============================================
+// CRON JOBS
+// ============================================
+
+cron.schedule('0 9 * * *', async () => {
+    console.log('🤖 Cron: Enviando recordatorios...');
+    await enviarRecordatorios();
+});
+
+cron.schedule('30 9 * * *', async () => {
+    console.log('🔄 Cron: Reintentando fallidos...');
+    await reintentarFallidos();
+});
 
 // ============================================
 // INICIAR SERVIDOR
@@ -170,7 +299,9 @@ function enviarRecordatorios() {
 const PUERTO = process.env.PORT || 3000;
 
 app.listen(PUERTO, () => {
-    console.log(`✂️ Servidor de peluqueria corriendo en puerto ${PUERTO}`);
-    console.log(`📅 Panel de citas: http://localhost:${PUERTO}/`);
-    console.log(`🤖 Recordatorios automaticos activados (9:00 AM)`);
+    console.log(`✂️ Servidor en puerto ${PUERTO}`);
+    console.log(`📅 Panel: http://localhost:${PUERTO}/`);
+    console.log(`👥 Clientes: http://localhost:${PUERTO}/clientes`);
+    console.log(`📊 Stats: http://localhost:${PUERTO}/stats/resumen`);
+    console.log(`🤖 Recordatorios: 9:00 AM | Reintentos: 9:30 AM`);
 });
